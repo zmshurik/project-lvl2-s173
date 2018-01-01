@@ -1,6 +1,6 @@
 <?php
 
-namespace Gendiff;
+namespace Differ\Gendiff;
 
 define(
     "HELP_MESSAGE",
@@ -20,5 +20,5 @@ DOC
 
 function run()
 {
-    $args = \Docopt::handle(HELP_MESSAGE);
+    $handle = \Docopt::handle(HELP_MESSAGE);
 }
