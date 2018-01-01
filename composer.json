@@ -12,10 +12,12 @@
         }
     ],
     "require": {
-        "docopt/docopt": "*"
+        "docopt/docopt": "*",
+        "funct/funct": "*"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer" : "*"
+        "squizlabs/php_codesniffer" : "*",
+        "phpunit/phpunit": "^6"
     },
     "scripts": {
         "phpcs" : "phpcs"
