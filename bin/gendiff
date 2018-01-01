@@ -3,4 +3,4 @@
 
 require_once __DIR__ . '/../autoload.php';
 
-\Differ\Gendiff\run();
+\Differ\RunParser\run();
