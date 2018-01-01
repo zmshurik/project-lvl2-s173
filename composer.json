@@ -3,8 +3,8 @@
     "bin": [
         "bin/gendiff"
     ],
-    "type": "This is utility for find diff in two configuration files",
-    "description": "Utility",
+    "type": "Utility",
+    "description": "This is utility for find diff in two configuration files",
     "authors": [
         {
             "name": "Alexander Kurakov",
