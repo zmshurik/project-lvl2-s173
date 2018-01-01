@@ -5,3 +5,6 @@ php:
 install: 
   - composer self-update
   - make install
+
+test:
+  - make lint
