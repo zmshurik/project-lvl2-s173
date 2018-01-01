@@ -1,0 +1,27 @@
+{
+    "name": "zmshurik/gendiff",
+    "bin": [
+        "bin/gendiff"
+    ],
+    "type": "This is utility for find diff in two configuration files",
+    "description": "Utility",
+    "authors": [
+        {
+            "name": "Alexander Kurakov",
+            "email": "zmshurik@yandex.ru"
+        }
+    ],
+    "require": {
+        "docopt/docopt": "*"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer" : "*"
+    },
+    "scripts": {
+        "phpcs" : "phpcs"
+    },
+    "autoload": {
+        "files": [
+        ]
+    }
+}
