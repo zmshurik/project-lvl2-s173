@@ -20,7 +20,8 @@
         "phpunit/phpunit": "^6"
     },
     "scripts": {
-        "phpcs" : "phpcs"
+        "phpcs" : "phpcs",
+        "phpunit": "phpunit"
     },
     "autoload": {
         "files": [
