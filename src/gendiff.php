@@ -3,7 +3,7 @@
 namespace Gendiff;
 
 define(
-    HELP_MESSAGE,
+    "HELP_MESSAGE",
     <<<DOC
 Generate diff
 
@@ -20,5 +20,5 @@ DOC
 
 function run()
 {
-    $args = Docopt::handle(HELP_MESSAGE);
+    $args = \Docopt::handle(HELP_MESSAGE);
 }
