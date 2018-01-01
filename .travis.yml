@@ -6,5 +6,5 @@ install:
   - composer self-update
   - make install
 
-test:
+script:
   - make lint
