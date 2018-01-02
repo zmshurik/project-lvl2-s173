@@ -44,8 +44,8 @@ DOC;
     public function testGenDiff()
     {
 
-        $path1 = __DIR__ . '/files/before.json';
-        $path2 = __DIR__ . '/files/after.json';
+        $path1 = __DIR__ . '/fixtures/before.json';
+        $path2 = __DIR__ . '/fixtures/after.json';
         $this->assertEquals($this->result, genDiff('pretty', $path1, $path2));
     }
 
