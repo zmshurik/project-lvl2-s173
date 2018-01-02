@@ -54,8 +54,10 @@ function parseAst($ast)
 
 function genDiff($format, $file1, $file2)
 {
-    $data1 = parse($file1);
-    $data2 = parse($file2);
+    $content1 = file_get_contents($file1);
+    $content2 = file_get_contents($file2);
+    $data1 = parse($content1);
+    $data2 = parse($content2);
     $diffAst = getDiffAst($data1, $data2);
     return parseAst($diffAst);
 }

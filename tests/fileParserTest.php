@@ -15,6 +15,7 @@ final class FileParserTest extends TestCase
             "host" => "hexlet.io"
         ];
         $path = __DIR__ . '/files/after.json';
-        $this->assertEquals($expected, parse($path));
+        $content = file_get_contents($path);
+        $this->assertEquals($expected, parse($content));
     }
 }

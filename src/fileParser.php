@@ -2,7 +2,7 @@
 
 namespace Differ\FileParser;
 
-function parse($path)
+function parse($content)
 {
-    return json_decode(file_get_contents($path), true);
+    return json_decode($content, true);
 }
