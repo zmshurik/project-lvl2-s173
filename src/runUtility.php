@@ -2,6 +2,8 @@
 
 namespace Differ\RunUtility;
 
+use function Differ\Gendiff\genDiff;
+
 define(
     "HELP_MESSAGE",
     <<<DOC
@@ -21,4 +23,15 @@ DOC
 function run()
 {
     $handle = \Docopt::handle(HELP_MESSAGE);
+    $format = $handle->args['--format'];
+    $isFullPath = function ($path) {
+        return $path[0] == DIRECTORY_SEPARATOR;
+    };
+    $firstFile = $handle->args['<firstFile>'];
+    $secondFile = $handle->args['<secondFile>'];
+    $firstPath = $isFullPath($firstFile) ? $firstFile : \getcwd() . DIRECTORY_SEPARATOR . $firstFile;
+    $secondPath = $isFullPath($secondFile) ? $secondFile : \getcwd() . DIRECTORY_SEPARATOR . $secondFile;
+    // echo $firstPath . PHP_EOL;
+    // echo $secondPath . PHP_EOL;
+    echo genDiff($format, $firstPath, $secondPath) . PHP_EOL;
 }
