@@ -12,21 +12,27 @@ function getDiffAst($data1, $data2)
         }
         return array_key_exists($key, $data1) ? 'deleted' : 'added';
     };
-    $getItem = function ($key) use ($data1, $data2, $getType) {
-        $item['name'] = $key;
-        $type = $getType($key);
-        $item['value'] = $type == 'added' ? $data2[$key] : $data1[$key];
-        $item['type'] = $type;
-        if ($type == 'changed') {
-            $item['newValue'] = $data2[$key];
+    $typeMap = [
+        'not changed' => function ($key) use ($data1) {
+            return ['name' => $key, 'value' => $data1[$key], 'type' => 'not changed'];
+        },
+        'changed' => function ($key) use ($data1, $data2) {
+            return ['name' => $key, 'value' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
+        },
+        'deleted' => function ($key) use ($data1) {
+            return ['name' => $key, 'value' => $data1[$key], 'type' => 'deleted'];
+        },
+        'added' => function ($key) use ($data2) {
+            return ['name' => $key, 'value' => $data2[$key], 'type' => 'added'];
         }
-        return $item;
-    };
+    ];
     $unionKeys = \Funct\Collection\union(array_keys($data1), array_keys($data2));
-    return array_reduce($unionKeys, function ($acc, $key) use ($getItem) {
-        $acc[] = $getItem($key);
-        return $acc;
-    }, []);
+    $result = array_map(function ($key) use ($typeMap, $getType) {
+        $type = $getType($key);
+        $getItem = $typeMap[$type];
+        return $getItem($key);
+    }, $unionKeys);
+    return array_values($result);
 }
 
 function parseAst($ast)
