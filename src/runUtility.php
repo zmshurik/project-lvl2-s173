@@ -31,7 +31,5 @@ function run()
     $secondFile = $handle->args['<secondFile>'];
     $firstPath = $isFullPath($firstFile) ? $firstFile : \getcwd() . DIRECTORY_SEPARATOR . $firstFile;
     $secondPath = $isFullPath($secondFile) ? $secondFile : \getcwd() . DIRECTORY_SEPARATOR . $secondFile;
-    // echo $firstPath . PHP_EOL;
-    // echo $secondPath . PHP_EOL;
     echo genDiff($format, $firstPath, $secondPath) . PHP_EOL;
 }
