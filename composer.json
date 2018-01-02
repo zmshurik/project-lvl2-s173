@@ -26,7 +26,8 @@
     "autoload": {
         "files": [
             "src/gendiff.php",
-            "src/runParser.php"
+            "src/runUtility.php",
+            "src/fileParser.php"
         ]
     }
 }

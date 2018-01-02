@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\RunParser;
+namespace Differ\RunUtility;
 
 define(
     "HELP_MESSAGE",
