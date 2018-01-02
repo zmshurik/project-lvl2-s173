@@ -13,7 +13,8 @@
     ],
     "require": {
         "docopt/docopt": "*",
-        "funct/funct": "*"
+        "funct/funct": "*",
+        "symfony/yaml": "*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer" : "*",
