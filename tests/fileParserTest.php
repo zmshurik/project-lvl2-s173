@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\tests\fileParserTest;
+namespace Differ\tests\FileParserTest;
 
 use PHPUnit\Framework\TestCase;
 use function \Differ\fileParser\parse;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\fileParser;
+namespace Differ\FileParser;
 
 function parse($path)
 {
