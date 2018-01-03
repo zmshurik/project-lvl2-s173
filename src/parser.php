@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\FileParser;
+namespace Differ\Parser;
 
 function parse($content)
 {

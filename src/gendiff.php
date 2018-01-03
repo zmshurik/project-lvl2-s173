@@ -2,7 +2,7 @@
 
 namespace Differ\Gendiff;
 
-use function Differ\FileParser\parse;
+use function Differ\Parser\parse;
 
 function getDiffAst($data1, $data2)
 {

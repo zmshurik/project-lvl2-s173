@@ -1,9 +1,9 @@
 <?php
 
-namespace Differ\tests\FileParserTest;
+namespace Differ\tests\ParserTest;
 
 use PHPUnit\Framework\TestCase;
-use function \Differ\fileParser\parse;
+use function \Differ\Parser\parse;
 
 final class FileParserTest extends TestCase
 {
