@@ -21,23 +21,23 @@ DOC;
     private $ast = [
         [
             'name' => 'host',
-            'value' => 'hexlet.io',
+            'oldValue' => 'hexlet.io',
             'type' => 'not changed'
         ],
         [
             'name' => 'timeout',
-            'value' => 50,
+            'oldValue' => 50,
             'type' => 'changed',
             'newValue' => 20
         ],
         [
             'name' => 'proxy',
-            'value' => '123.234.53.22',
+            'oldValue' => '123.234.53.22',
             'type' => 'deleted',
         ],
         [
             'name' => 'verbose',
-            'value' => true,
+            'newValue' => true,
             'type' => 'added'
         ]
     ];
