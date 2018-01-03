@@ -14,8 +14,11 @@ final class FileParserTest extends TestCase
             "verbose" => true,
             "host" => "hexlet.io"
         ];
-        $path = __DIR__ . '/fixtures/after.json';
-        $content = file_get_contents($path);
-        $this->assertEquals($expected, parse($content));
+        $jsonPath = __DIR__ . '/fixtures/after.json';
+        $jsonContent = file_get_contents($jsonPath);
+        $this->assertEquals($expected, parse($jsonContent, 'json'));
+        $ymlPath = __DIR__ . '/fixtures/after.yml';
+        $ymlContent = file_get_contents($ymlPath);
+        $this->assertEquals($expected, parse($ymlContent, 'yml'));
     }
 }

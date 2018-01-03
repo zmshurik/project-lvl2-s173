@@ -80,8 +80,8 @@ function genDiff($format, $file1, $file2)
 {
     $content1 = file_get_contents($file1);
     $content2 = file_get_contents($file2);
-    $data1 = parse($content1);
-    $data2 = parse($content2);
+    $data1 = parse($content1, 'json');
+    $data2 = parse($content2, 'json');
     $diffAst = getDiffAst($data1, $data2);
     return parseAst($diffAst);
 }

@@ -2,7 +2,18 @@
 
 namespace Differ\Parser;
 
-function parse($content)
+use Symfony\Component\Yaml\Yaml;
+
+function parse($content, $fileType)
 {
-    return json_decode($content, true);
+    $fileTypeMap = [
+        'json' => function ($content) {
+            return json_decode($content, true);
+        },
+        'yml' => function ($content) {
+            return Yaml::parse($content);
+        }
+    ];
+    $finalParse = $fileTypeMap[$fileType];
+    return $finalParse($content);
 }
