@@ -28,7 +28,7 @@
         "files": [
             "src/gendiff.php",
             "src/runUtility.php",
-            "src/fileParser.php"
+            "src/parser.php"
         ]
     }
 }
