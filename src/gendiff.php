@@ -6,37 +6,47 @@ use function Differ\Parser\parse;
 
 function getDiffAst($data1, $data2)
 {
-    $getItem = function ($key) use ($data1, $data2) {
-        if (array_key_exists($key, $data1) && array_key_exists($key, $data2)) {
-            return $data1[$key] == $data2[$key] ?
-                ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed'] :
-                ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
-        }
-        return array_key_exists($key, $data1) ?
-            ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'deleted'] :
-            ['name' => $key, 'newValue' => $data2[$key], 'type' => 'added'];
-    };
-    // $typeMap = [
-    //     'not changed' => [
-    //         function ($key) use ($data1) {
-    //             return ['name' => $key, 'value' => $data1[$key], 'type' => 'not changed'];
-    //         },
-    //         function ($key) use ($data1, $data2) {
-    //          return array_key_exists($key, $data1) && array_key_exists($key, $data2) && $data1[$key] == $data2[$key];
-    //         }
-    //     ]
-    //     'changed' => function ($key) use ($data1, $data2) {
-    //         return ['name' => $key, 'value' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
-    //     },
-    //     'deleted' => function ($key) use ($data1) {
-    //         return ['name' => $key, 'value' => $data1[$key], 'type' => 'deleted'];
-    //     },
-    //     'added' => function ($key) use ($data2) {
-    //         return ['name' => $key, 'value' => $data2[$key], 'type' => 'added'];
-    //     }
-    // ];
+    $typeMap = [
+        'not changed' => [
+            'getItem' => function ($key) use ($data1) {
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed'];
+            },
+            'isNeedType' => function ($key) use ($data1, $data2) {
+                return array_key_exists($key, $data1) && array_key_exists($key, $data2) && $data1[$key] == $data2[$key];
+            }
+        ],
+        'changed' => [
+            'getItem' => function ($key) use ($data1, $data2) {
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
+            },
+            'isNeedType' => function ($key) use ($data1, $data2) {
+                return array_key_exists($key, $data1) && array_key_exists($key, $data2) && $data1[$key] != $data2[$key];
+            }
+        ],
+        'deleted' => [
+            'getItem' => function ($key) use ($data1) {
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'deleted'];
+            },
+            'isNeedType' => function ($key) use ($data1, $data2) {
+                return array_key_exists($key, $data1) && !array_key_exists($key, $data2);
+            }
+        ],
+        'added' => [
+            'getItem' => function ($key) use ($data2) {
+                return ['name' => $key, 'newValue' => $data2[$key], 'type' => 'added'];
+            },
+            'isNeedType' => function ($key) use ($data1, $data2) {
+                return !array_key_exists($key, $data1) && array_key_exists($key, $data2);
+            }
+        ]
+    ];
     $unionKeys = \Funct\Collection\union(array_keys($data1), array_keys($data2));
-    $result = array_map(function ($key) use ($getItem) {
+    $result = array_map(function ($key) use ($typeMap) {
+        list($typeFunctions) = array_values(array_filter($typeMap, function ($current) use ($key) {
+            $isNeedType = $current['isNeedType'];
+            return $isNeedType($key);
+        }));
+        $getItem = $typeFunctions['getItem'];
         return $getItem($key);
     }, $unionKeys);
     return array_values($result);
