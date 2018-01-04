@@ -9,9 +9,11 @@ use function \Differ\Gendiff\renderAst;
 
 final class GendiffTest extends TestCase
 {
-    private $result;
-    private $ast;
-    
+    private $simpleResult;
+    private $complexResult;
+    private $simpleAst;
+    private $complexAst;
+
     public function setUp()
     {
         $this->simpleResult = json_encode([
@@ -21,7 +23,33 @@ final class GendiffTest extends TestCase
             "- proxy" => '123.234.53.22',
             "+ verbose" => true
         ], JSON_PRETTY_PRINT);
-        
+
+        $this->complexResult = json_encode([
+            "  common" => [
+                "  setting1" => "Value 1",
+                "- setting2" => 200,
+                "  setting3" => true,
+                "- setting6" => [
+                    "  key" => "value"
+                ],
+                "+ setting4" => "blah blah",
+                "+ setting5" => [
+                    "  key5" => "value5"
+                ]
+            ],
+            "  group1" => [
+                "- baz" => "bas",
+                "+ baz" => "bars",
+                "+ foo" => "bar"
+            ],
+            "- group2" => [
+                "  abc" => "12345"
+            ],
+            "+ group3" => [
+                "  fee"=> "100500"
+            ]
+        ], JSON_PRETTY_PRINT);
+
         $this->simpleAst = [
             [
                 'name' => 'host',
@@ -43,6 +71,95 @@ final class GendiffTest extends TestCase
                 'name' => 'verbose',
                 'newValue' => true,
                 'type' => 'added'
+            ]
+        ];
+        $this->complexAst = [
+            [
+                'name' => 'common',
+                'type' => 'not changed',
+                'children' => [
+                    [
+                        'name' => 'setting1',
+                        'oldValue' => 'Value 1',
+                        'type' => 'not changed'
+                    ],
+                    [
+                        'name' => 'setting2',
+                        'oldValue' => 200,
+                        'type' => 'deleted'
+                    ],
+                    [
+                        'name' => 'setting1',
+                        'oldValue' => true,
+                        'type' => 'not changed'
+                    ],
+                    [
+                        'name' => 'setting6',
+                        'type' => 'deleted',
+                        'children' => [
+                            [
+                                'name' => 'key',
+                                'oldValue' => 'value',
+                                'type' => 'not changed'
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'setting4',
+                        'newValue' => 'blah blah',
+                        'type' => 'added'
+                    ],
+                    [
+                        'name' => 'settings5',
+                        'type' => 'added',
+                        'children' => [
+                            [
+                                'name' => 'key5',
+                                'oldValue' => 'value5',
+                                'type' => 'not changed'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'name' => 'group1',
+                'type' => 'not chaged',
+                'cildren' => [
+                    [
+                        'name' => 'baz',
+                        'oldValue' => 'bas',
+                        'type' => 'changed',
+                        'newValue' => 'bars'
+                    ],
+                    [
+                        'name' => 'foo',
+                        'oldValue' => 'bar',
+                        'type' => 'not changed'
+                    ]
+                ]
+            ],
+            [
+                'name' => 'group2',
+                'type' => 'not changed',
+                'children' => [
+                    [
+                        'name' => 'abc',
+                        'oldValue' => 12345,
+                        'type' => 'not changed'
+                    ]
+                ]
+            ],
+            [
+                'name' => 'group3',
+                'type' => 'not changed',
+                'children' => [
+                    [
+                        'name' => 'fee',
+                        'oldValue' => 100500,
+                        'type' => 'not changed'
+                    ]
+                ]
             ]
         ];
     }
