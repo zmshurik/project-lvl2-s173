@@ -52,38 +52,35 @@ function getDiffAst($data1, $data2)
     return array_values($result);
 }
 
-function parseAst($ast)
+function renderAst($ast)
 {
-    $toBoolStr = function ($value) {
-        return $value ? 'true' : 'false';
-    };
     $typeMap = [
-        'not changed' => function ($astItem) use ($toBoolStr) {
+        'not changed' => function ($astItem) {
             extract($astItem);
-            return ["  $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)];
+            return ["  $name" => $oldValue];
         },
-        'changed' => function ($astItem) use ($toBoolStr) {
+        'changed' => function ($astItem) {
             extract($astItem);
             return [
-                "+ $name: " . (is_bool($newValue) ? $toBoolStr($newValue) : $newValue),
-                "- $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)
+                "+ $name" => $newValue,
+                "- $name" => $oldValue
             ];
         },
-        'deleted' => function ($astItem) use ($toBoolStr) {
+        'deleted' => function ($astItem) {
             extract($astItem);
-            return ["- $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)];
+            return ["- $name" => $oldValue];
         },
-        'added' => function ($astItem) use ($toBoolStr) {
+        'added' => function ($astItem) {
             extract($astItem);
-            return ["+ $name: " . (is_bool($newValue) ? $toBoolStr($newValue) : $newValue)];
+            return ["+ $name" => $newValue];
         }
     ];
     $parts = array_reduce($ast, function ($acc, $item) use ($typeMap) {
         $getNewItems = $typeMap[$item['type']];
         $newAcc = array_merge($acc, $getNewItems($item));
         return $newAcc;
-    }, ['{']);
-    return implode(PHP_EOL . '  ', $parts) . PHP_EOL . '}';
+    }, []);
+    return json_encode($parts, JSON_PRETTY_PRINT);
 }
 
 function genDiff($format, $file1, $file2)
@@ -95,5 +92,5 @@ function genDiff($format, $file1, $file2)
     $data1 = parse($content1, $fileType1);
     $data2 = parse($content2, $fileType2);
     $diffAst = getDiffAst($data1, $data2);
-    return parseAst($diffAst);
+    return renderAst($diffAst);
 }

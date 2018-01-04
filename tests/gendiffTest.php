@@ -5,7 +5,7 @@ namespace Differ\tests\GetdiffTest;
 use PHPUnit\Framework\TestCase;
 use function \Differ\Gendiff\genDiff;
 use function \Differ\Gendiff\getDiffAst;
-use function \Differ\Gendiff\parseAst;
+use function \Differ\Gendiff\renderAst;
 
 final class GendiffTest extends TestCase
 {
@@ -14,7 +14,7 @@ final class GendiffTest extends TestCase
     
     public function setUp()
     {
-        $this->result = json_encode([
+        $this->simpleResult = json_encode([
             "  host" => 'hexlet.io',
             "+ timeout" => 20,
             "- timeout" => 50,
@@ -22,7 +22,7 @@ final class GendiffTest extends TestCase
             "+ verbose" => true
         ], JSON_PRETTY_PRINT);
         
-        $this->ast = [
+        $this->simpleAst = [
             [
                 'name' => 'host',
                 'oldValue' => 'hexlet.io',
@@ -52,7 +52,7 @@ final class GendiffTest extends TestCase
 
         $path1 = __DIR__ . '/fixtures/before.json';
         $path2 = __DIR__ . '/fixtures/after.json';
-        $this->assertEquals($this->result, genDiff('pretty', $path1, $path2));
+        $this->assertEquals($this->simpleResult, genDiff('pretty', $path1, $path2));
     }
 
     public function testGetDiffAst()
@@ -67,10 +67,10 @@ final class GendiffTest extends TestCase
             "verbose" => true,
             "host" => "hexlet.io"
         ];
-        $this->assertEquals($this->ast, getDiffAst($data1, $data2));
+        $this->assertEquals($this->simpleAst, getDiffAst($data1, $data2));
     }
-    public function testParseAst()
+    public function testRenderAst()
     {
-        $this->assertEquals($this->result, parseAst($this->ast));
+        $this->assertEquals($this->simpleResult, renderAst($this->simpleAst));
     }
 }
