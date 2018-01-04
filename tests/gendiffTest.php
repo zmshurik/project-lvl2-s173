@@ -186,6 +186,45 @@ final class GendiffTest extends TestCase
         ];
         $this->assertEquals($this->simpleAst, getDiffAst($data1, $data2));
     }
+
+    public function testComplexAstGeneration()
+    {
+        $data1 = [
+            "common" => [
+                'setting1' => 'Value 1',
+                'setting2' => 200,
+                'setting3' => true,
+                'setting6' => [
+                    'key' => 'value'
+                ],
+            ],
+            "group1" => [
+                'baz' => 'bas',
+                'foo' => 'bar'
+            ],
+            "group2" => [
+                'abc' => 12345
+            ]
+        ];
+        $data2 = [
+            "common" => [
+                'setting1' => 'Value 1',
+                'setting3' => true,
+                'setting4' => 'blah blah',
+                'setting5' => [
+                    'key5' => 'value5'
+                ],
+            ],
+            "group1" => [
+                'foo' => 'bar',
+                'baz' => 'bars'
+            ],
+            "group3" => [
+                'fee' => 100500
+            ]
+        ];
+        $this->assertEquals($this->complexAst, getDiffAst($data1, $data2));
+    }
     public function testRenderAst()
     {
         $this->assertEquals($this->simpleResult, renderAst($this->simpleAst));
