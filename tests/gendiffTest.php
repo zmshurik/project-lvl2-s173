@@ -9,38 +9,44 @@ use function \Differ\Gendiff\parseAst;
 
 final class GendiffTest extends TestCase
 {
-    private $result = <<<DOC
-{
-    host: hexlet.io
-  + timeout: 20
-  - timeout: 50
-  - proxy: 123.234.53.22
-  + verbose: true
-}
-DOC;
-    private $ast = [
-        [
-            'name' => 'host',
-            'oldValue' => 'hexlet.io',
-            'type' => 'not changed'
-        ],
-        [
-            'name' => 'timeout',
-            'oldValue' => 50,
-            'type' => 'changed',
-            'newValue' => 20
-        ],
-        [
-            'name' => 'proxy',
-            'oldValue' => '123.234.53.22',
-            'type' => 'deleted',
-        ],
-        [
-            'name' => 'verbose',
-            'newValue' => true,
-            'type' => 'added'
-        ]
-    ];
+    private $result;
+    private $ast;
+    
+    public function setUp()
+    {
+        $this->result = json_encode([
+            "  host" => 'hexlet.io',
+            "+ timeout" => 20,
+            "- timeout" => 50,
+            "- proxy" => '123.234.53.22',
+            "+ verbose" => true
+        ], JSON_PRETTY_PRINT);
+        
+        $this->ast = [
+            [
+                'name' => 'host',
+                'oldValue' => 'hexlet.io',
+                'type' => 'not changed'
+            ],
+            [
+                'name' => 'timeout',
+                'oldValue' => 50,
+                'type' => 'changed',
+                'newValue' => 20
+            ],
+            [
+                'name' => 'proxy',
+                'oldValue' => '123.234.53.22',
+                'type' => 'deleted',
+            ],
+            [
+                'name' => 'verbose',
+                'newValue' => true,
+                'type' => 'added'
+            ]
+        ];
+    }
+
     public function testGenDiff()
     {
 
