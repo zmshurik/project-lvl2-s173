@@ -21,7 +21,7 @@ final class FileParserTest extends TestCase
         $ymlContent = file_get_contents($ymlPath);
         $this->assertEquals($expected, parse($ymlContent, 'yml'));
     }
-    public function testParserNested()
+    public function testParserWithNested()
     {
         $expected = [
             "common" => [
