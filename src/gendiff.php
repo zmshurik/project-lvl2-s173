@@ -134,6 +134,11 @@ function renderAst($ast, $isFirstCall = true)
         },
         'nested' => function ($astItem) use ($toBoolStr) {
             extract($astItem);
+            if (is_array($value)) {
+                $value = renderAst($value, NOT_FIRST_CALL);
+                $result = "  $name: " . implode(PHP_EOL, $value);
+                return explode(PHP_EOL, $result);
+            }
             return ["  $name: " . (is_bool($value) ? $toBoolStr($value) : $value)];
         }
     ];
