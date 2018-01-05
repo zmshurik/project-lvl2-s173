@@ -22,7 +22,7 @@ function getDiffAst($data1, $data2)
         'with children' => [
             'getItem' => function ($key) use ($data1, $data2) {
                 $children = getDiffAst($data1[$key], $data2[$key]);
-                return ['name' => $key, 'isGroup' => true, 'type' => 'with children', 'children' => $children];
+                return ['name' => $key, 'type' => 'with children', 'children' => $children];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -32,7 +32,7 @@ function getDiffAst($data1, $data2)
         ],
         'not changed' => [
             'getItem' => function ($key) use ($data1) {
-                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed', 'isGroup' => false];
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed'];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -44,12 +44,7 @@ function getDiffAst($data1, $data2)
         'changed' => [
             'getItem' => function ($key) use ($data1, $data2) {
                 return [
-                    'name' => $key,
-                    'oldValue' => $data1[$key],
-                    'type' => 'changed',
-                    'newValue' => $data2[$key],
-                    'isGroup' => false
-                ];
+                    'name' => $key, 'oldValue' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -60,9 +55,8 @@ function getDiffAst($data1, $data2)
         ],
         'deleted' => [
             'getItem' => function ($key) use ($data1) {
-                $isGroup = is_array($data1[$key]);
-                $value = $isGroup ? getNestedTree($data1[$key]) : $data1[$key];
-                return ['name' => $key, 'oldValue' => $value, 'type' => 'deleted', 'isGroup' => $isGroup];
+                $value = is_array($data1[$key]) ? getNestedTree($data1[$key]) : $data1[$key];
+                return ['name' => $key, 'oldValue' => $value, 'type' => 'deleted'];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) && !array_key_exists($key, $data2);
@@ -70,9 +64,8 @@ function getDiffAst($data1, $data2)
         ],
         'added' => [
             'getItem' => function ($key) use ($data2) {
-                $isGroup = is_array($data2[$key]);
-                $value = $isGroup ? getNestedTree($data2[$key]) : $data2[$key];
-                return ['name' => $key, 'newValue' => $value, 'type' => 'added', 'isGroup' => $isGroup];
+                $value = is_array($data2[$key]) ? getNestedTree($data2[$key]) : $data2[$key];
+                return ['name' => $key, 'newValue' => $value, 'type' => 'added'];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return !array_key_exists($key, $data1) && array_key_exists($key, $data2);
@@ -110,7 +103,7 @@ function renderAst($ast, $isFirstCall = true)
         },
         'deleted' => function ($astItem) use ($toBoolStr) {
             extract($astItem);
-            if ($isGroup) {
+            if (is_array($oldValue)) {
                 $value = renderAst($oldValue, NOT_FIRST_CALL);
                 $result = "- $name: " . implode(PHP_EOL, $value);
                 return explode(PHP_EOL, $result);
@@ -119,7 +112,7 @@ function renderAst($ast, $isFirstCall = true)
         },
         'added' => function ($astItem) use ($toBoolStr) {
             extract($astItem);
-            if ($isGroup) {
+            if (is_array($newValue)) {
                 $value = renderAst($newValue, NOT_FIRST_CALL);
                 $result = "+ $name: " . implode(PHP_EOL, $value);
                 return explode(PHP_EOL, $result);

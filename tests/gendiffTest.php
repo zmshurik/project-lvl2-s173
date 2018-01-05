@@ -58,52 +58,44 @@ DOC;
             [
                 'name' => 'host',
                 'oldValue' => 'hexlet.io',
-                'type' => 'not changed',
-                'isGroup' => false
+                'type' => 'not changed'
             ],
             [
                 'name' => 'timeout',
                 'oldValue' => 50,
                 'type' => 'changed',
-                'newValue' => 20,
-                'isGroup' => false
+                'newValue' => 20
             ],
             [
                 'name' => 'proxy',
                 'oldValue' => '123.234.53.22',
-                'type' => 'deleted',
-                'isGroup' => false
+                'type' => 'deleted'
             ],
             [
                 'name' => 'verbose',
                 'newValue' => true,
-                'type' => 'added',
-                'isGroup' => false
+                'type' => 'added'
             ]
         ];
         $this->complexAst = [
             [
                 'name' => 'common',
                 'type' => 'with children',
-                'isGroup' => true,
                 'children' => [
                     [
                         'name' => 'setting1',
                         'oldValue' => 'Value 1',
-                        'type' => 'not changed',
-                        'isGroup' => false
+                        'type' => 'not changed'
                     ],
                     [
                         'name' => 'setting2',
                         'oldValue' => 200,
-                        'type' => 'deleted',
-                        'isGroup' => false
+                        'type' => 'deleted'
                     ],
                     [
                         'name' => 'setting3',
                         'oldValue' => true,
-                        'type' => 'not changed',
-                        'isGroup' => false
+                        'type' => 'not changed'
                     ],
                     [
                         'name' => 'setting6',
@@ -114,15 +106,12 @@ DOC;
                                 'type' =>'nested'
                             ]
                         ],
-                        'type' => 'deleted',
-                        'isGroup' => true
-
+                        'type' => 'deleted'
                     ],
                     [
                         'name' => 'setting4',
                         'newValue' => 'blah blah',
-                        'type' => 'added',
-                        'isGroup' => false
+                        'type' => 'added'
                     ],
                     [
                         'name' => 'setting5',
@@ -133,28 +122,24 @@ DOC;
                                 'type' => 'nested'
                             ]
                         ],
-                        'type' => 'added',
-                        'isGroup' => true
+                        'type' => 'added'
                     ]
                 ]
             ],
             [
                 'name' => 'group1',
                 'type' => 'with children',
-                'isGroup' => true,
                 'children' => [
                     [
                         'name' => 'baz',
                         'oldValue' => 'bas',
                         'type' => 'changed',
-                        'newValue' => 'bars',
-                        'isGroup' => false
+                        'newValue' => 'bars'
                     ],
                     [
                         'name' => 'foo',
                         'oldValue' => 'bar',
-                        'type' => 'not changed',
-                        'isGroup' => false
+                        'type' => 'not changed'
                     ]
                 ]
             ],
@@ -167,8 +152,7 @@ DOC;
                         'type' => 'nested'
                     ]
                 ],
-                'type' => 'deleted',
-                'isGroup' => true
+                'type' => 'deleted'
             ],
             [
                 'name' => 'group3',
@@ -179,8 +163,7 @@ DOC;
                         'type' => 'nested'
                     ]
                 ],
-                'type' => 'added',
-                'isGroup' => true
+                'type' => 'added'
             ]
         ];
     }
