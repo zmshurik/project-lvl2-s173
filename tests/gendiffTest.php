@@ -16,150 +16,171 @@ final class GendiffTest extends TestCase
 
     public function setUp()
     {
-        $this->simpleResult = json_encode([
-            "  host" => 'hexlet.io',
-            "+ timeout" => 20,
-            "- timeout" => 50,
-            "- proxy" => '123.234.53.22',
-            "+ verbose" => true
-        ], JSON_PRETTY_PRINT);
+        $this->simpleResult = <<<DOC
+{
+    host: hexlet.io
+  + timeout: 20
+  - timeout: 50
+  - proxy: 123.234.53.22
+  + verbose: true
+}
+DOC;
 
-        $this->complexResult = json_encode([
-            "  common" => [
-                "  setting1" => "Value 1",
-                "- setting2" => 200,
-                "  setting3" => true,
-                "- setting6" => [
-                    "  key" => "value"
-                ],
-                "+ setting4" => "blah blah",
-                "+ setting5" => [
-                    "  key5" => "value5"
-                ]
-            ],
-            "  group1" => [
-                "- baz" => "bas",
-                "+ baz" => "bars",
-                "+ foo" => "bar"
-            ],
-            "- group2" => [
-                "  abc" => "12345"
-            ],
-            "+ group3" => [
-                "  fee"=> "100500"
-            ]
-        ], JSON_PRETTY_PRINT);
+        $this->complexResult = <<<DOC
+{
+    common: {
+        setting1: Value 1
+      - setting2: 200
+        setting3: true
+      - setting6: {
+            key: value
+        }
+      + setting4: blah blah
+      + setting5: {
+            key5: value5
+        }
+    }
+    group1: {
+      + baz: bars
+      - baz: bas
+        foo: bar
+    }
+  - group2: {
+        abc: 12345
+    }
+  + group3: {
+        fee: 100500
+    }
+}
+DOC;
 
         $this->simpleAst = [
             [
                 'name' => 'host',
                 'oldValue' => 'hexlet.io',
-                'type' => 'not changed'
+                'type' => 'not changed',
+                'isGroup' => false
             ],
             [
                 'name' => 'timeout',
                 'oldValue' => 50,
                 'type' => 'changed',
-                'newValue' => 20
+                'newValue' => 20,
+                'isGroup' => false
             ],
             [
                 'name' => 'proxy',
                 'oldValue' => '123.234.53.22',
                 'type' => 'deleted',
+                'isGroup' => false
             ],
             [
                 'name' => 'verbose',
                 'newValue' => true,
-                'type' => 'added'
+                'type' => 'added',
+                'isGroup' => false
             ]
         ];
         $this->complexAst = [
             [
                 'name' => 'common',
-                'type' => 'not changed',
+                'type' => 'with children',
+                'isGroup' => true,
                 'children' => [
                     [
                         'name' => 'setting1',
                         'oldValue' => 'Value 1',
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'isGroup' => false
                     ],
                     [
                         'name' => 'setting2',
                         'oldValue' => 200,
-                        'type' => 'deleted'
+                        'type' => 'deleted',
+                        'isGroup' => false
                     ],
                     [
-                        'name' => 'setting1',
+                        'name' => 'setting3',
                         'oldValue' => true,
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'isGroup' => false
                     ],
                     [
                         'name' => 'setting6',
-                        'type' => 'deleted',
-                        'children' => [
+                        'oldValue' => [
                             [
                                 'name' => 'key',
-                                'oldValue' => 'value',
-                                'type' => 'not changed'
+                                'value' => 'value',
+                                'type' =>'nested'
                             ]
-                        ]
+                        ],
+                        'type' => 'deleted',
+                        'isGroup' => true
+
                     ],
                     [
                         'name' => 'setting4',
                         'newValue' => 'blah blah',
-                        'type' => 'added'
+                        'type' => 'added',
+                        'isGroup' => false
                     ],
                     [
-                        'name' => 'settings5',
-                        'type' => 'added',
-                        'children' => [
+                        'name' => 'setting5',
+                        'newValue' => [
                             [
                                 'name' => 'key5',
-                                'oldValue' => 'value5',
-                                'type' => 'not changed'
+                                'value' => 'value5',
+                                'type' => 'nested'
                             ]
-                        ]
+                        ],
+                        'type' => 'added',
+                        'isGroup' => true
                     ]
                 ]
             ],
             [
                 'name' => 'group1',
-                'type' => 'not chaged',
-                'cildren' => [
+                'type' => 'with children',
+                'isGroup' => true,
+                'children' => [
                     [
                         'name' => 'baz',
                         'oldValue' => 'bas',
                         'type' => 'changed',
-                        'newValue' => 'bars'
+                        'newValue' => 'bars',
+                        'isGroup' => false
                     ],
                     [
                         'name' => 'foo',
                         'oldValue' => 'bar',
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'isGroup' => false
                     ]
                 ]
             ],
             [
                 'name' => 'group2',
-                'type' => 'not changed',
-                'children' => [
+                'oldValue' => [
                     [
                         'name' => 'abc',
-                        'oldValue' => 12345,
-                        'type' => 'not changed'
+                        'value' => 12345,
+                        'type' => 'nested'
                     ]
-                ]
+                ],
+                'type' => 'deleted',
+                'isGroup' => true
             ],
             [
                 'name' => 'group3',
-                'type' => 'not changed',
-                'children' => [
+                'newValue' => [
                     [
                         'name' => 'fee',
-                        'oldValue' => 100500,
-                        'type' => 'not changed'
+                        'value' => 100500,
+                        'type' => 'nested'
                     ]
-                ]
+                ],
+                'type' => 'added',
+                'isGroup' => true
             ]
         ];
     }
@@ -170,6 +191,13 @@ final class GendiffTest extends TestCase
         $path1 = __DIR__ . '/fixtures/before.json';
         $path2 = __DIR__ . '/fixtures/after.json';
         $this->assertEquals($this->simpleResult, genDiff('pretty', $path1, $path2));
+    }
+
+    public function testGenDifWithNested()
+    {
+        $path1 = __DIR__ . '/fixtures/beforeComplex.json';
+        $path2 = __DIR__ . '/fixtures/afterComplex.json';
+        $this->assertEquals($this->complexResult, genDiff('pretty', $path1, $path2));
     }
 
     public function testGetDiffAst()
@@ -227,6 +255,9 @@ final class GendiffTest extends TestCase
     }
     public function testRenderAst()
     {
-        $this->assertEquals($this->simpleResult, renderAst($this->simpleAst));
+        $simpleOutput = implode(PHP_EOL, renderAst($this->simpleAst));
+        $this->assertEquals($this->simpleResult, $simpleOutput);
+        $nestedOutput = implode(PHP_EOL, renderAst($this->complexAst));
+        $this->assertEquals($this->complexResult, $nestedOutput);
     }
 }
