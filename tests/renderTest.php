@@ -3,74 +3,17 @@
 namespace Differ\tests\GetdiffTest;
 
 use PHPUnit\Framework\TestCase;
-use function \Differ\Gendiff\genDiff;
-use function \Differ\Gendiff\getDiffAst;
+use function \Differ\Render\renderToPretty;
+use function Differ\Render\renderToPlain;
 
-final class GendiffTest extends TestCase
+final class RenderTest extends TestCase
 {
-    public function testGenDiff()
-    {
-        $output = <<<DOC
-{
-    host: hexlet.io
-  + timeout: 20
-  - timeout: 50
-  - proxy: 123.234.53.22
-  + verbose: true
-}
-DOC;
-        $path1 = __DIR__ . '/fixtures/before.json';
-        $path2 = __DIR__ . '/fixtures/after.json';
-        $this->assertEquals($output, genDiff('pretty', $path1, $path2));
-    }
+    private $simpleAst;
+    private $complexAst;
 
-    public function testGenDiffWithNested()
+    public function setUp()
     {
-        $outputPretty = <<<DOC
-{
-    common: {
-        setting1: Value 1
-      - setting2: 200
-        setting3: true
-      - setting6: {
-            key: value
-        }
-      + setting4: blah blah
-      + setting5: {
-            key5: value5
-        }
-    }
-    group1: {
-      + baz: bars
-      - baz: bas
-        foo: bar
-    }
-  - group2: {
-        abc: 12345
-    }
-  + group3: {
-        fee: 100500
-    }
-}
-DOC;
-        $outputPlain = <<<DOC
-Property 'common.setting2' was removed
-Property 'common.setting6' was removed
-Property 'common.setting4' was added with value: 'blah blah'
-Property 'common.setting5' was added with value: 'complex value'
-Property 'group1.baz' was changed. From 'bas' to 'bars'
-Property 'group2' was removed
-Property 'group3' was added with value: 'complex value'
-DOC;
-        $path1 = __DIR__ . '/fixtures/beforeComplex.json';
-        $path2 = __DIR__ . '/fixtures/afterComplex.json';
-        $this->assertEquals($outputPretty, genDiff('pretty', $path1, $path2));
-        $this->assertEquals($outputPlain, genDiff('plain', $path1, $path2));
-    }
-
-    public function testGetDiffAst()
-    {
-        $ast =  [
+        $this->simpleAst = [
             [
                 'name' => 'host',
                 'oldValue' => 'hexlet.io',
@@ -97,22 +40,7 @@ DOC;
                 'children' => []
             ]
         ];
-        $data1 = [
-            "host" => "hexlet.io",
-            "timeout" => 50,
-            "proxy" => '123.234.53.22'
-        ];
-        $data2 = [
-            "timeout" => 20,
-            "verbose" => true,
-            "host" => "hexlet.io"
-        ];
-        $this->assertEquals($ast, getDiffAst($data1, $data2));
-    }
-
-    public function testComplexAstGeneration()
-    {
-        $ast = [
+        $this->complexAst = [
             [
                 'name' => 'common',
                 'type' => 'need check in deep',
@@ -215,40 +143,64 @@ DOC;
                 ]
             ]
         ];
-        $data1 = [
-            "common" => [
-                'setting1' => 'Value 1',
-                'setting2' => 200,
-                'setting3' => true,
-                'setting6' => [
-                    'key' => 'value'
-                ],
-            ],
-            "group1" => [
-                'baz' => 'bas',
-                'foo' => 'bar'
-            ],
-            "group2" => [
-                'abc' => 12345
-            ]
-        ];
-        $data2 = [
-            "common" => [
-                'setting1' => 'Value 1',
-                'setting3' => true,
-                'setting4' => 'blah blah',
-                'setting5' => [
-                    'key5' => 'value5'
-                ],
-            ],
-            "group1" => [
-                'foo' => 'bar',
-                'baz' => 'bars'
-            ],
-            "group3" => [
-                'fee' => 100500
-            ]
-        ];
-        $this->assertEquals($ast, getDiffAst($data1, $data2));
+    }
+
+    public function testRenderToPretty()
+    {
+        $simple = <<<DOC
+{
+    host: hexlet.io
+  + timeout: 20
+  - timeout: 50
+  - proxy: 123.234.53.22
+  + verbose: true
+}
+DOC;
+        $complex = <<<DOC
+{
+    common: {
+        setting1: Value 1
+      - setting2: 200
+        setting3: true
+      - setting6: {
+            key: value
+        }
+      + setting4: blah blah
+      + setting5: {
+            key5: value5
+        }
+    }
+    group1: {
+      + baz: bars
+      - baz: bas
+        foo: bar
+    }
+  - group2: {
+        abc: 12345
+    }
+  + group3: {
+        fee: 100500
+    }
+}
+DOC;
+        $simpleOutput = implode(PHP_EOL, renderToPretty($this->simpleAst));
+        $this->assertEquals($simple, $simpleOutput);
+        $nestedOutput = implode(PHP_EOL, renderToPretty($this->complexAst));
+        $this->assertEquals($complex, $nestedOutput);
+    }
+
+    public function testRenderToPlain()
+    {
+        $output = <<<DOC
+Property 'common.setting2' was removed
+Property 'common.setting6' was removed
+Property 'common.setting4' was added with value: 'blah blah'
+Property 'common.setting5' was added with value: 'complex value'
+Property 'group1.baz' was changed. From 'bas' to 'bars'
+Property 'group2' was removed
+Property 'group3' was added with value: 'complex value'
+DOC;
+        $nestedOutput = implode(PHP_EOL, renderToPlain($this->complexAst));
+        $this->assertEquals($output, $nestedOutput);
     }
 }

@@ -28,7 +28,8 @@
         "files": [
             "src/gendiff.php",
             "src/runUtility.php",
-            "src/parser.php"
+            "src/parser.php",
+            "src/render.php"
         ]
     }
 }
