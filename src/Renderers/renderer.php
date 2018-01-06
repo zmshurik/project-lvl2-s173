@@ -18,6 +18,9 @@ function render($ast, $format)
         },
         'plain' => function ($ast) {
             return implode(PHP_EOL, renderToPlain($ast));
+        },
+        'json' => function ($ast) {
+            return json_encode($ast, JSON_PRETTY_PRINT);
         }
     ];
     $render = $formatMap[$format];
