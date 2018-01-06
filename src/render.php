@@ -110,10 +110,10 @@ function render($ast, $format)
 {
     $formatMap = [
         'pretty' => function ($ast) {
-            return renderToPretty($ast);
+            return implode(PHP_EOL, renderToPretty($ast));
         },
         'plain' => function ($ast) {
-            return renderToPlain($ast);
+            return implode(PHP_EOL, renderToPlain($ast));
         }
     ];
     $render = $formatMap[$format];

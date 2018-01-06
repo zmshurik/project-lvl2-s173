@@ -96,6 +96,5 @@ function genDiff($format, $file1, $file2)
     $data1 = parse($content1, $fileType1);
     $data2 = parse($content2, $fileType2);
     $diffAst = getDiffAst($data1, $data2);
-    $output = implode(PHP_EOL, render($diffAst, $format));
-    return $output;
+    return render($diffAst, $format);
 }
