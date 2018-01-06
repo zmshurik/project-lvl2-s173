@@ -3,8 +3,8 @@
 namespace Differ\tests\GetdiffTest;
 
 use PHPUnit\Framework\TestCase;
-use function \Differ\Render\renderToPretty;
-use function Differ\Render\renderToPlain;
+use function Differ\Renderers\ToPlain\renderToPlain;
+use function Differ\Renderers\ToPretty\renderToPretty;
 
 final class RenderTest extends TestCase
 {

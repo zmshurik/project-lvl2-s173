@@ -3,7 +3,7 @@
 namespace Differ\Gendiff;
 
 use function Differ\Parser\parse;
-use function Differ\Render\render;
+use function Differ\Renderers\Renderer\render;
 
 function getNestedTree($data)
 {

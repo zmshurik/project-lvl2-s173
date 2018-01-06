@@ -29,7 +29,9 @@
             "src/gendiff.php",
             "src/runUtility.php",
             "src/parser.php",
-            "src/render.php"
+            "src/Renderers/renderer.php",
+            "src/Renderers/toPretty.php",
+            "src/Renderers/toPlain.php"
         ]
     }
 }
