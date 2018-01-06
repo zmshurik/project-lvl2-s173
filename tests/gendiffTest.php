@@ -58,112 +58,130 @@ DOC;
             [
                 'name' => 'host',
                 'oldValue' => 'hexlet.io',
-                'type' => 'not changed'
+                'type' => 'not changed',
+                'children' => []
             ],
             [
                 'name' => 'timeout',
                 'oldValue' => 50,
                 'type' => 'changed',
-                'newValue' => 20
+                'newValue' => 20,
+                'children' => []
             ],
             [
                 'name' => 'proxy',
                 'oldValue' => '123.234.53.22',
-                'type' => 'deleted'
+                'type' => 'deleted',
+                'children' => []
             ],
             [
                 'name' => 'verbose',
                 'newValue' => true,
-                'type' => 'added'
+                'type' => 'added',
+                'children' => []
             ]
         ];
         $this->complexAst = [
             [
                 'name' => 'common',
-                'type' => 'with children',
+                'type' => 'need check in deep',
                 'children' => [
                     [
                         'name' => 'setting1',
                         'oldValue' => 'Value 1',
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'children' => []
                     ],
                     [
                         'name' => 'setting2',
                         'oldValue' => 200,
-                        'type' => 'deleted'
+                        'type' => 'deleted',
+                        'children' => []
                     ],
                     [
                         'name' => 'setting3',
                         'oldValue' => true,
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'children' => []
                     ],
                     [
                         'name' => 'setting6',
-                        'oldValue' => [
+                        'oldValue' => ['key' => 'value'],
+                        'type' => 'deleted',
+                        'children' => [
                             [
                                 'name' => 'key',
                                 'value' => 'value',
-                                'type' =>'nested'
+                                'type' =>'nested',
+                                'children' => []
                             ]
-                        ],
-                        'type' => 'deleted'
+                        ]
                     ],
                     [
                         'name' => 'setting4',
                         'newValue' => 'blah blah',
-                        'type' => 'added'
+                        'type' => 'added',
+                        'children' => []
                     ],
                     [
                         'name' => 'setting5',
-                        'newValue' => [
+                        'newValue' => ['key5' => 'value5'],
+                        'type' => 'added',
+                        'children' => [
                             [
                                 'name' => 'key5',
                                 'value' => 'value5',
-                                'type' => 'nested'
+                                'type' => 'nested',
+                                'children' => []
                             ]
-                        ],
-                        'type' => 'added'
+                        ]
                     ]
                 ]
             ],
             [
                 'name' => 'group1',
-                'type' => 'with children',
+                'type' => 'need check in deep',
                 'children' => [
                     [
                         'name' => 'baz',
                         'oldValue' => 'bas',
                         'type' => 'changed',
-                        'newValue' => 'bars'
+                        'newValue' => 'bars',
+                        'children' => []
                     ],
                     [
                         'name' => 'foo',
                         'oldValue' => 'bar',
-                        'type' => 'not changed'
+                        'type' => 'not changed',
+                        'children' => []
                     ]
                 ]
             ],
             [
                 'name' => 'group2',
-                'oldValue' => [
+                'oldValue' => ['abc' => 12345],
+                'type' => 'deleted',
+                'children' => [
                     [
                         'name' => 'abc',
                         'value' => 12345,
-                        'type' => 'nested'
+                        'type' => 'nested',
+                        'children' => []
                     ]
-                ],
-                'type' => 'deleted'
+                ]
             ],
             [
                 'name' => 'group3',
-                'newValue' => [
+                'newValue' => ['fee' => 100500],
+                'type' => 'added',
+                'children' => [
                     [
                         'name' => 'fee',
                         'value' => 100500,
-                        'type' => 'nested'
+                        'type' => 'nested',
+                        'children' => []
                     ]
-                ],
-                'type' => 'added'
+                ]
             ]
         ];
     }

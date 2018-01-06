@@ -10,8 +10,8 @@ define('NOT_FIRST_CALL', false);
 function getNestedTree($data)
 {
     $nestedTree = array_map(function ($key) use ($data) {
-        $value = is_array($data[$key]) ? getNestedTree($data[$key]) : $data[$key];
-        return ['name' => $key, 'value' => $value, 'type' => 'nested'];
+        $children = is_array($data[$key]) ? getNestedTree($data[$key]) : [];
+        return ['name' => $key, 'value' => $data[$key], 'type' => 'nested', 'children' => $children];
     }, array_keys($data));
     return array_values($nestedTree);
 }
@@ -19,10 +19,10 @@ function getNestedTree($data)
 function getDiffAst($data1, $data2)
 {
     $typeMap = [
-        'with children' => [
+        'need check in deep' => [
             'getItem' => function ($key) use ($data1, $data2) {
                 $children = getDiffAst($data1[$key], $data2[$key]);
-                return ['name' => $key, 'type' => 'with children', 'children' => $children];
+                return ['name' => $key, 'type' => 'need check in deep', 'children' => $children];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -32,7 +32,7 @@ function getDiffAst($data1, $data2)
         ],
         'not changed' => [
             'getItem' => function ($key) use ($data1) {
-                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed'];
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'not changed', 'children' => []];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -44,7 +44,12 @@ function getDiffAst($data1, $data2)
         'changed' => [
             'getItem' => function ($key) use ($data1, $data2) {
                 return [
-                    'name' => $key, 'oldValue' => $data1[$key], 'type' => 'changed', 'newValue' => $data2[$key]];
+                    'name' => $key,
+                    'oldValue' => $data1[$key],
+                    'type' => 'changed',
+                    'newValue' => $data2[$key],
+                    'children' => []
+                ];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) &&
@@ -55,8 +60,8 @@ function getDiffAst($data1, $data2)
         ],
         'deleted' => [
             'getItem' => function ($key) use ($data1) {
-                $value = is_array($data1[$key]) ? getNestedTree($data1[$key]) : $data1[$key];
-                return ['name' => $key, 'oldValue' => $value, 'type' => 'deleted'];
+                $children = is_array($data1[$key]) ? getNestedTree($data1[$key]) : [];
+                return ['name' => $key, 'oldValue' => $data1[$key], 'type' => 'deleted', 'children' => $children];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return array_key_exists($key, $data1) && !array_key_exists($key, $data2);
@@ -64,8 +69,8 @@ function getDiffAst($data1, $data2)
         ],
         'added' => [
             'getItem' => function ($key) use ($data2) {
-                $value = is_array($data2[$key]) ? getNestedTree($data2[$key]) : $data2[$key];
-                return ['name' => $key, 'newValue' => $value, 'type' => 'added'];
+                $children = is_array($data2[$key]) ? getNestedTree($data2[$key]) : [];
+                return ['name' => $key, 'newValue' => $data2[$key], 'type' => 'added', 'children' => $children];
             },
             'isNeedType' => function ($key) use ($data1, $data2) {
                 return !array_key_exists($key, $data1) && array_key_exists($key, $data2);
@@ -89,50 +94,46 @@ function renderAst($ast, $isFirstCall = true)
     $toBoolStr = function ($value) {
         return $value ? 'true' : 'false';
     };
+    $processChildren = function ($children, $name, $sign) {
+        $value = renderAst($children, NOT_FIRST_CALL);
+        $result = "$sign $name: " . implode(PHP_EOL, $value);
+        return explode(PHP_EOL, $result);
+    };
     $typeMap = [
         'not changed' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
+            $name = $astItem['name'];
+            $oldValue = $astItem['oldValue'];
             return ["  $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)];
         },
         'changed' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
+            $name = $astItem['name'];
+            $oldValue = $astItem['oldValue'];
+            $newValue = $astItem['newValue'];
             return [
                 "+ $name: " . (is_bool($newValue) ? $toBoolStr($newValue) : $newValue),
                 "- $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)
             ];
         },
-        'deleted' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
-            if (is_array($oldValue)) {
-                $value = renderAst($oldValue, NOT_FIRST_CALL);
-                $result = "- $name: " . implode(PHP_EOL, $value);
-                return explode(PHP_EOL, $result);
-            }
-            return ["- $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)];
+        'deleted' => function ($astItem) use ($toBoolStr, $processChildren) {
+            $name = $astItem['name'];
+            $oldValue = $astItem['oldValue'];
+            return is_array($oldValue) ? $processChildren($astItem['children'], $name, '-') :
+                ["- $name: " . (is_bool($oldValue) ? $toBoolStr($oldValue) : $oldValue)];
         },
-        'added' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
-            if (is_array($newValue)) {
-                $value = renderAst($newValue, NOT_FIRST_CALL);
-                $result = "+ $name: " . implode(PHP_EOL, $value);
-                return explode(PHP_EOL, $result);
-            }
-            return ["+ $name: " . (is_bool($newValue) ? $toBoolStr($newValue) : $newValue)];
+        'added' => function ($astItem) use ($toBoolStr, $processChildren) {
+            $name = $astItem['name'];
+            $newValue = $astItem['newValue'];
+            return is_array($newValue) ? $processChildren($astItem['children'], $name, '+') :
+                ["+ $name: " . (is_bool($newValue) ? $toBoolStr($newValue) : $newValue)];
         },
-        'with children' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
-            $value = renderAst($children, NOT_FIRST_CALL);
-            $result = "  $name: " . implode(PHP_EOL, $value);
-            return explode(PHP_EOL, $result);
+        'need check in deep' => function ($astItem) use ($processChildren) {
+            return $processChildren($astItem['children'], $astItem['name'], ' ');
         },
         'nested' => function ($astItem) use ($toBoolStr) {
-            extract($astItem);
-            if (is_array($value)) {
-                $value = renderAst($value, NOT_FIRST_CALL);
-                $result = "  $name: " . implode(PHP_EOL, $value);
-                return explode(PHP_EOL, $result);
-            }
-            return ["  $name: " . (is_bool($value) ? $toBoolStr($value) : $value)];
+            $name = $astItem['name'];
+            $value = $astItem['value'];
+            return is_array($value) ? $processChildren($astItem['children'], $name, ' ') :
+                ["  $name: " . (is_bool($value) ? $toBoolStr($value) : $value)];
         }
     ];
     $parts = array_reduce($ast, function ($acc, $item) use ($typeMap) {
