@@ -7,6 +7,11 @@ use function Differ\Renderers\Renderer\toBoolStr;
 
 define('NOT_FIRST_CALL', false);
 
+function normalizeVaule($value)
+{
+    return is_bool($value) ? toBoolStr($value) : $value;
+}
+
 function renderToPretty($ast, $isFirstCall = true)
 {
     $processChildren = function ($children, $name, $sign) {
@@ -17,38 +22,32 @@ function renderToPretty($ast, $isFirstCall = true)
     $typeMap = [
         'not changed' => function ($astItem) {
             $name = $astItem['name'];
-            $oldValue = $astItem['oldValue'];
-            return ["  $name: " . (is_bool($oldValue) ? toBoolStr($oldValue) : $oldValue)];
+            $value = normalizeVaule($astItem['oldValue']);
+            return ["  $name: $value"];
         },
         'changed' => function ($astItem) {
             $name = $astItem['name'];
-            $oldValue = $astItem['oldValue'];
-            $newValue = $astItem['newValue'];
-            return [
-                "+ $name: " . (is_bool($newValue) ? toBoolStr($newValue) : $newValue),
-                "- $name: " . (is_bool($oldValue) ? toBoolStr($oldValue) : $oldValue)
-            ];
+            $oldValue = normalizeVaule($astItem['oldValue']);
+            $newValue = normalizeVaule($astItem['newValue']);
+            return ["+ $name: $newValue", "- $name: $oldValue"];
         },
         'deleted' => function ($astItem) use ($processChildren) {
             $name = $astItem['name'];
-            $oldValue = $astItem['oldValue'];
-            return is_array($oldValue) ? $processChildren($astItem['children'], $name, '-') :
-                ["- $name: " . (is_bool($oldValue) ? toBoolStr($oldValue) : $oldValue)];
+            $value = normalizeVaule($astItem['oldValue']);
+            return is_array($value) ? $processChildren($astItem['children'], $name, '-') : ["- $name: $value"];
         },
         'added' => function ($astItem) use ($processChildren) {
             $name = $astItem['name'];
-            $newValue = $astItem['newValue'];
-            return is_array($newValue) ? $processChildren($astItem['children'], $name, '+') :
-                ["+ $name: " . (is_bool($newValue) ? toBoolStr($newValue) : $newValue)];
+            $value = normalizeVaule($astItem['newValue']);
+            return is_array($value) ? $processChildren($astItem['children'], $name, '+') : ["+ $name: $value"];
         },
         'need check in deep' => function ($astItem) use ($processChildren) {
             return $processChildren($astItem['children'], $astItem['name'], ' ');
         },
         'nested' => function ($astItem) {
             $name = $astItem['name'];
-            $value = $astItem['value'];
-            return is_array($value) ? $processChildren($astItem['children'], $name, ' ') :
-                ["  $name: " . (is_bool($value) ? toBoolStr($value) : $value)];
+            $value = normalizeVaule($astItem['value']);
+            return is_array($value) ? $processChildren($astItem['children'], $name, ' ') : ["  $name: $value"];
         }
     ];
     $parts = array_reduce($ast, function ($acc, $item) use ($typeMap) {
